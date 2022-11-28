@@ -163,7 +163,7 @@ app.layout = html.Div([
                 selected_rows=[],
                 page_action="native",
                 page_current=0,
-                page_size=20,
+                page_size=100,
             ),
             width={'size': 10, "offset": 1, 'order': 1}
         ),
