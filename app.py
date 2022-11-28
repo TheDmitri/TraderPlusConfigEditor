@@ -54,11 +54,6 @@ app.layout = html.Div([
     dcc.Store(id='session', storage_type='session'),
     dbc.Row([
         dbc.Col(
-            dbc.Input(id="code_input", type="any", debounce=True, value="",
-                      placeholder="paste your config here", size="md"),
-            width="auto"
-        ),
-        dbc.Col(
             dcc.Upload(
                 id='upload-data',
                 children=html.Div([
@@ -162,6 +157,7 @@ app.layout = html.Div([
                 is_focused=True,
                 filter_action="native",
                 sort_mode="multi",
+                sort_action="native",
                 row_deletable=True,
                 selected_columns=[],
                 selected_rows=[],
@@ -222,7 +218,7 @@ app.layout = html.Div([
         ),
         dbc.Tooltip(
             "Make sure to select the coefficient cell of the product you want to calculate. You also need to make sure buy price and sell price are given so the calcul can be done correctly",
-            target="bttn_calculate_coefficient",
+            target="btn_calculate_coefficient",
         ),
     ]),
 ])
@@ -253,13 +249,12 @@ def check_for_duplicate_category(categories):
     Input('upload-data', 'filename'),
     Input('products_table', 'selected_cells'),
     Input('products_table', 'derived_virtual_data'),
-    Input('code_input','value'),
     State('category_dropdown', 'value'),
     State('session', 'data'),
     prevent_initial_call=True
 )
 def change_category_name(newCategoryName, n_clicks, remove_n_clicks, contents, filename, selected_cells,
-                         post_filter_rows,code_input, value, data):
+                         post_filter_rows, value, data):
     ctx = dash.callback_context
 
     if ctx.triggered[0]['prop_id'] == 'upload-data.contents' and contents is not None:
@@ -295,13 +290,6 @@ def change_category_name(newCategoryName, n_clicks, remove_n_clicks, contents, f
             return data, fillDropDownMenu(data['dataframe']['0'][3]), '', 0
         else:
             raise PreventUpdate
-
-    if ctx.triggered[0]['prop_id'] == 'code_input.value':
-        file = io.StringIO(code_input)
-        df = pd.read_json(file, orient='index')
-        check_for_duplicate_category(df.values[3][0])
-        dff = {'dataframe': df.to_dict('series')}
-        return dff, fillDropDownMenu(df.values[3][0]), '', 0
 
     if ctx.triggered[0]['prop_id'] == 'remove_category.n_clicks':
         if remove_n_clicks > 0:
